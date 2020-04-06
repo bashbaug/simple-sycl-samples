@@ -22,16 +22,22 @@ To build the samples:
 
 1. Setup oneAPI variables:
 
+```sh
     /path/to/inteloneapi/setvars.bat
+```
 
 2. Create build files using CMake, specifying the DPC++ toolchain.  For example:
 
+```sh
     mkdir build && cd build
     cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=../dpcpp_toolchain.cmake ..
+```
 
 3. Build with the generated build files:
 
+```sh
     ninja install
+```
 
 The files in the top-level `samples` directory are intended to be standard SYCL samples and should build and run on any SYCL implementation.
 
