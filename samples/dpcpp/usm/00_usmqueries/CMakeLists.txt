@@ -25,8 +25,9 @@ project(${SAMPLE_NAME})
 add_executable( ${SAMPLE_NAME} main.cpp )
 
 target_compile_options(${SAMPLE_NAME} PRIVATE -fsycl )
-target_link_options(${SAMPLE_NAME} PRIVATE -fsycl )
-target_link_libraries(${SAMPLE_NAME} PRIVATE sycl )
+# Passing -fsycl via target_link_libraries for older versions of CMake:
+#target_link_options(${SAMPLE_NAME} PRIVATE -fsycl )
+target_link_libraries(${SAMPLE_NAME} PRIVATE sycl -fsycl )
 
 set_target_properties( ${SAMPLE_NAME} PROPERTIES FOLDER "Samples/dpcpp/usm/${SAMPLE_NUMBER}_${SAMPLE_NAME}" )
 

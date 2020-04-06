@@ -15,29 +15,37 @@ samples/                Samples
 
 This section is a work in progress!
 
-These samples are currently built on Windows using the Beta 5 DPC++ compiler.
+These samples are currently built on Windows and Linux (Ubuntu 18.04) using the Beta 5 DPC++ compiler.
 
-I have had best luck building on Windows using a Ninja generator.
-To build the samples:
+I have been using the Ninja CMake generator.
+Here is how I have been building the samples:
 
 1. Setup oneAPI variables:
 
-```sh
-    /path/to/inteloneapi/setvars.bat
-```
+    For Windows:
+
+    ```sh
+    \path\to\inteloneapi\setvars.bat
+    ```
+
+    For Linux:
+
+    ```sh
+    source /path/to/inteloneapi/setvars.sh
+    ```
 
 2. Create build files using CMake, specifying the DPC++ toolchain.  For example:
 
-```sh
+    ```sh
     mkdir build && cd build
     cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=../dpcpp_toolchain.cmake ..
-```
+    ```
 
 3. Build with the generated build files:
 
-```sh
+    ```sh
     ninja install
-```
+    ```
 
 The files in the top-level `samples` directory are intended to be standard SYCL samples and should build and run on any SYCL implementation.
 

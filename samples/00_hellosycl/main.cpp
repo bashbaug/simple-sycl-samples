@@ -31,10 +31,10 @@ int main()
     const size_t array_size = 16;
     int data[array_size];
 
-    queue q{ cpu_selector{} };
+    queue q{ default_selector{} };
 
     std::cout << "Hello from SYCL!\n";
-    std::cout << "Running on SYCL device " << q.get_device().get_info<info::device::name>() << std::endl;
+    std::cout << "Running on default SYCL device " << q.get_device().get_info<info::device::name>() << std::endl;
 
     {
         buffer<int, 1>  resultBuf{ data, range<1>{array_size} };
