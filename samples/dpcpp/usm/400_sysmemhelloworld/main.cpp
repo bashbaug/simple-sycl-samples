@@ -57,7 +57,7 @@ int main(
     }
     if (printUsage) {
         std::cerr <<
-            "Usage: smemhelloworld  [options]\n"
+            "Usage: sysmemhelloworld  [options]\n"
             "Options:\n"
             "      -d: Device Index (default = 0)\n"
             "      -p: Platform Index (default = 0)\n"
@@ -76,8 +76,8 @@ int main(
     std::cout << "Running on SYCL device: " << 
         d.get_info<info::device::name>() << std::endl;
 
-    auto s_src = (uint32_t*)malloc_shared(gwx * sizeof(uint32_t), d, c);
-    auto s_dst = (uint32_t*)malloc_shared(gwx * sizeof(uint32_t), d, c);
+    auto s_src = (uint32_t*)malloc(gwx * sizeof(uint32_t));
+    auto s_dst = (uint32_t*)malloc(gwx * sizeof(uint32_t));
 
     if (s_src && s_dst) {
         // init
@@ -119,8 +119,8 @@ int main(
     }
 
     // clean up
-    free(s_src, c);
-    free(s_dst, c);
+    free(s_src);
+    free(s_dst);
 
     return 0;
 }

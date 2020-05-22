@@ -15,7 +15,7 @@ samples/                Samples
 
 This section is a work in progress!
 
-These samples are currently built on Windows and Linux (Ubuntu 18.04) using the Beta 5 DPC++ compiler.
+These samples are currently built on Windows and Linux (Ubuntu 18.04) using the Beta 6 DPC++ compiler.
 
 I have been using the Ninja CMake generator.
 Here is how I have been building the samples:

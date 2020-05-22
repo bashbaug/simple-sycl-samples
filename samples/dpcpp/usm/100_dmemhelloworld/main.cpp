@@ -32,8 +32,8 @@ int main(
     char** argv )
 {
     bool printUsage = false;
-    int platformIndex = 0;
-    int deviceIndex = 0;
+    int pi = 0;
+    int di = 0;
 
     if (argc < 1) {
         printUsage = true;
@@ -42,12 +42,12 @@ int main(
         for (size_t i = 1; i < argc; i++) {
             if (!strcmp( argv[i], "-d" )) {
                 if (++i < argc) {
-                    deviceIndex = strtol(argv[i], NULL, 10);
+                    di = strtol(argv[i], NULL, 10);
                 }
             }
             else if (!strcmp( argv[i], "-p")) {
                 if (++i < argc) {
-                    platformIndex = strtol(argv[i], NULL, 10);
+                    pi = strtol(argv[i], NULL, 10);
                 }
             }
             else {
@@ -65,7 +65,8 @@ int main(
         return -1;
     }
 
-    ordered_queue q{ platform::get_platforms()[platformIndex].get_devices()[deviceIndex] };
+    // setup
+    queue q{ platform::get_platforms()[pi].get_devices()[di], property::queue::in_order() };
 
     auto d = q.get_device();
     auto c = q.get_context();
@@ -79,7 +80,7 @@ int main(
     auto d_src = (uint32_t*)malloc_device(gwx * sizeof(uint32_t), d, c);
     auto d_dst = (uint32_t*)malloc_device(gwx * sizeof(uint32_t), d, c);
 
-    if( h_buf && d_src && d_dst) {
+    if (h_buf && d_src && d_dst) {
         // init
 
         for( size_t i = 0; i < gwx; i++ ) {
@@ -114,13 +115,16 @@ int main(
         if( mismatches ) {
             std::cerr << "Error: Found "
                 << mismatches << " mismatches / " << gwx << " values!!!\n";
-        } else {
+        }
+        else {
             std::cout << "Success.\n";
         }
     }
 
+    // clean up
     delete [] h_buf;
     free(d_src, c);
     free(d_dst, c);
+
     return 0;
 }

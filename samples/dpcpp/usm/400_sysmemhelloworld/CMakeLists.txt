@@ -18,9 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory( 00_usmqueries )
+set(SAMPLE_NAME sysmemhelloworld)
+set(SAMPLE_NUMBER 400)
 
-add_subdirectory( 100_dmemhelloworld )
-add_subdirectory( 200_hmemhelloworld )
-add_subdirectory( 300_smemhelloworld )
-add_subdirectory( 400_sysmemhelloworld )
+project(${SAMPLE_NAME})
+add_executable( ${SAMPLE_NAME} main.cpp )
+
+target_compile_options(${SAMPLE_NAME} PRIVATE -fsycl -fsycl-unnamed-lambda )
+# Passing -fsycl via target_link_libraries for older versions of CMake:
+#target_link_options(${SAMPLE_NAME} PRIVATE -fsycl )
+target_link_libraries(${SAMPLE_NAME} PRIVATE sycl -fsycl )
+
+set_target_properties( ${SAMPLE_NAME} PROPERTIES FOLDER "Samples/dpcpp/usm/${SAMPLE_NUMBER}_${SAMPLE_NAME}" )
+
+install(TARGETS ${SAMPLE_NAME} CONFIGURATIONS Debug   DESTINATION ${SAMPLES_PLATFORM_NAME}/Debug   )
+install(TARGETS ${SAMPLE_NAME} CONFIGURATIONS Release DESTINATION ${SAMPLES_PLATFORM_NAME}/Release )

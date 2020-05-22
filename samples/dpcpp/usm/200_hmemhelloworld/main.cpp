@@ -32,8 +32,8 @@ int main(
     char** argv )
 {
     bool printUsage = false;
-    int platformIndex = 0;
-    int deviceIndex = 0;
+    int pi = 0;
+    int di = 0;
 
     if (argc < 1) {
         printUsage = true;
@@ -42,12 +42,12 @@ int main(
         for (size_t i = 1; i < argc; i++) {
             if (!strcmp( argv[i], "-d" )) {
                 if (++i < argc) {
-                    deviceIndex = strtol(argv[i], NULL, 10);
+                    di = strtol(argv[i], NULL, 10);
                 }
             }
             else if (!strcmp( argv[i], "-p")) {
                 if (++i < argc) {
-                    platformIndex = strtol(argv[i], NULL, 10);
+                    pi = strtol(argv[i], NULL, 10);
                 }
             }
             else {
@@ -57,7 +57,7 @@ int main(
     }
     if (printUsage) {
         std::cerr <<
-            "Usage: dmemhelloworld  [options]\n"
+            "Usage: hmemhelloworld  [options]\n"
             "Options:\n"
             "      -d: Device Index (default = 0)\n"
             "      -p: Platform Index (default = 0)\n"
@@ -65,21 +65,21 @@ int main(
         return -1;
     }
 
-    auto d = platform::get_platforms()[platformIndex].get_devices()[deviceIndex];
+    // setup
+    queue q{ platform::get_platforms()[pi].get_devices()[di], property::queue::in_order() };
+
+    auto d = q.get_device();
+    auto c = q.get_context();
 
     std::cout << "Running on SYCL platform: " << 
         d.get_platform().get_info<info::platform::name>() << std::endl;
     std::cout << "Running on SYCL device: " << 
         d.get_info<info::device::name>() << std::endl;
 
-    ordered_queue q{ d };
-
-    auto c = q.get_context();
-
     auto h_src = (uint32_t*)malloc_host(gwx * sizeof(uint32_t), c);
     auto h_dst = (uint32_t*)malloc_host(gwx * sizeof(uint32_t), c);
 
-    if( h_src && h_dst) {
+    if (h_src && h_dst) {
         // init
 
         for( size_t i = 0; i < gwx; i++ ) {
@@ -118,7 +118,9 @@ int main(
         }
     }
 
+    // clean up
     free(h_src, c);
     free(h_dst, c);
+
     return 0;
 }

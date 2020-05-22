@@ -27,9 +27,6 @@ using namespace cl::sycl;
 
 int main()
 {
-    const size_t array_size = 16;
-    int data[array_size];
-
     for( auto& p : platform::get_platforms() )
     {
         std::cout << std::endl << "SYCL Platform: " << p.get_info<info::platform::name>() << std::endl;
