@@ -18,6 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory( 99_mathfuncs )
+set(SAMPLE_NAME mathfuncs)
+set(SAMPLE_NUMBER 99)
 
-add_subdirectory( usm )
+project(${SAMPLE_NAME})
+add_executable( ${SAMPLE_NAME} main.cpp )
+
+target_compile_options(${SAMPLE_NAME} PRIVATE -fsycl -fsycl-unnamed-lambda )
+# Passing -fsycl via target_link_libraries for older versions of CMake:
+#target_link_options(${SAMPLE_NAME} PRIVATE -fsycl )
+target_link_libraries(${SAMPLE_NAME} PRIVATE sycl -fsycl )
+
+set_target_properties( ${SAMPLE_NAME} PROPERTIES FOLDER "Samples/${SAMPLE_NUMBER}_${SAMPLE_NAME}" )
+
+install(TARGETS ${SAMPLE_NAME} CONFIGURATIONS Debug   DESTINATION ${SAMPLES_PLATFORM_NAME}/Debug   )
+install(TARGETS ${SAMPLE_NAME} CONFIGURATIONS Release DESTINATION ${SAMPLES_PLATFORM_NAME}/Release )
