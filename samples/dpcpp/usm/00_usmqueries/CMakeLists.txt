@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Ben Ashbaugh
+# Copyright (c) 2021 Ben Ashbaugh
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,18 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(SAMPLE_NAME usmqueries)
-set(SAMPLE_NUMBER 00)
-
-project(${SAMPLE_NAME})
-add_executable( ${SAMPLE_NAME} main.cpp )
-
-target_compile_options(${SAMPLE_NAME} PRIVATE -fsycl )
-# Passing -fsycl via target_link_libraries for older versions of CMake:
-#target_link_options(${SAMPLE_NAME} PRIVATE -fsycl )
-target_link_libraries(${SAMPLE_NAME} PRIVATE sycl -fsycl )
-
-set_target_properties( ${SAMPLE_NAME} PROPERTIES FOLDER "Samples/dpcpp/usm/${SAMPLE_NUMBER}_${SAMPLE_NAME}" )
-
-install(TARGETS ${SAMPLE_NAME} CONFIGURATIONS Debug   DESTINATION ${SAMPLES_PLATFORM_NAME}/Debug   )
-install(TARGETS ${SAMPLE_NAME} CONFIGURATIONS Release DESTINATION ${SAMPLES_PLATFORM_NAME}/Release )
+add_sycl_sample(
+    TEST
+    NUMBER 00
+    TARGET usmqueries
+    CATEGORY usm
+    SOURCES main.cpp)

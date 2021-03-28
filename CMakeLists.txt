@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Ben Ashbaugh
+# Copyright (c) 2021 Ben Ashbaugh
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,11 @@ endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-project(SimpleSYCLSamples)
+project(SimpleSYCLSamples VERSION 1.0)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    enable_testing()
+endif()
 
 add_subdirectory(samples)
 
