@@ -37,13 +37,14 @@ function(add_sycl_sample)
     target_include_directories(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_INCLUDES})
     target_link_libraries(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_LIBS})
 
-    target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda )
+    target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda)
     # Passing -fsycl via target_link_libraries for older versions of CMake:
     #target_link_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl )
-    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE sycl -fsycl )
+    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE sycl -fsycl)
 
     if (WIN32)
         target_compile_definitions(${SYCL_SAMPLE_TARGET} PRIVATE _CRT_SECURE_NO_WARNINGS)
+        target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE /EHa)
     endif()
 
     set_target_properties(${SYCL_SAMPLE_TARGET} PROPERTIES FOLDER "Samples/${SYCL_SAMPLE_CATEGORY}/${SYCL_SAMPLE_NUMBER}_${SYCL_SAMPLE_TARGET}")
@@ -64,5 +65,6 @@ endfunction()
 
 add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
+add_subdirectory( 04_julia )
 
 add_subdirectory( dpcpp )

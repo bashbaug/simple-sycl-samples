@@ -44,8 +44,8 @@ int main()
                 << d.get_info<info::device::usm_restricted_shared_allocations>() << std::endl;
             std::cout << "\t\tSupports usm_shared_allocations: "
                 << d.get_info<info::device::usm_shared_allocations>() << std::endl;
-            std::cout << "\t\tSupports usm_system_allocator: "
-                << d.get_info<info::device::usm_system_allocator>() << std::endl;
+            std::cout << "\t\tSupports usm_system_allocations: "
+                << d.get_info<info::device::usm_system_allocations>() << std::endl;
         }
     }
 
