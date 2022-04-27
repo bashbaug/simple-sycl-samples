@@ -1,23 +1,7 @@
 /*
-// Copyright (c) 2020 Ben Ashbaugh
+// Copyright (c) 2022 Ben Ashbaugh
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// SPDX-License-Identifier: MIT
 */
 
 #include <CL/sycl.hpp>
@@ -105,6 +89,32 @@ static void go_in_order_queue(Params& params, const int numKernels)
         for (int i = 0; i < numKernels; i++) {
             queue.submit([&](sycl::handler& h) {
                 sycl::accessor acc{params.buffers[i], h};
+                h.parallel_for(params.numElements, TimeSink(acc, params.numIterations));
+            });
+        }
+        queue.wait();
+
+        auto end = test_clock::now();
+        std::chrono::duration<float> elapsed_seconds = end - start;
+        best = std::min(best, elapsed_seconds.count());
+    }
+    printf("Finished in %f seconds\n", best);
+}
+
+static void go_out_of_order_queue_deps(Params& params, const int numKernels)
+{
+    init(params);
+
+    printf("%40s (n=%3d): ", __FUNCTION__, numKernels); fflush(stdout);
+
+    sycl::queue queue(params.context, params.device);
+
+    float best = 999.0f;
+    for (int test = 0; test < testIterations; test++) {
+        auto start = test_clock::now();
+        for (int i = 0; i < numKernels; i++) {
+            queue.submit([&](sycl::handler& h) {
+                sycl::accessor acc{params.buffers[0], h};
                 h.parallel_for(params.numElements, TimeSink(acc, params.numIterations));
             });
         }
@@ -267,6 +277,30 @@ static void go_in_order_queue_usm(Params& params, const int numKernels)
     printf("Finished in %f seconds\n", best);
 }
 
+static void go_out_of_order_queue_usm_deps(Params& params, const int numKernels)
+{
+    init_usm(params);
+
+    printf("%40s (n=%3d): ", __FUNCTION__, numKernels); fflush(stdout);
+
+    sycl::queue queue(params.context, params.device);
+
+    float best = 999.0f;
+    for (int test = 0; test < testIterations; test++) {
+        auto start = test_clock::now();
+        sycl::event dependency;
+        for (int i = 0; i < numKernels; i++) {
+            dependency = queue.parallel_for(params.numElements, dependency, TimeSinkUSM(params.dptrs[i], params.numIterations));
+        }
+        queue.wait();
+
+        auto end = test_clock::now();
+        std::chrono::duration<float> elapsed_seconds = end - start;
+        best = std::min(best, elapsed_seconds.count());
+    }
+    printf("Finished in %f seconds\n", best);
+}
+
 static void go_out_of_order_queue_usm(Params& params, const int numKernels)
 {
     init_usm(params);
@@ -353,7 +387,7 @@ int main(int argc, char** argv)
     int platformIndex = 0;
     int deviceIndex = 0;
     int numKernels = -1;
-    bool testMultipleContext = false;
+    bool testMultipleContexts = false;
 
     {
         popl::OptionParser op("Supported Options");
@@ -362,7 +396,7 @@ int main(int argc, char** argv)
         op.add<popl::Value<int>>("k", "kernels", "Kernels to Execute (-1 for all)", numKernels, &numKernels);
         op.add<popl::Value<int>>("i", "iterations", "Iterations in Each Kernel", params.numIterations, &params.numIterations);
         op.add<popl::Value<size_t>>("e", "elements", "Number of ND-Range Elements", params.numElements, &params.numElements);
-        op.add<popl::Switch>("", "multicontext", "Run the Multiple Context Tests", &testMultipleContext);
+        op.add<popl::Switch>("", "multicontexts", "Run the Multiple Context Tests", &testMultipleContexts);
         bool printUsage = false;
         try {
             op.parse(argc, argv);
@@ -420,6 +454,9 @@ int main(int argc, char** argv)
         go_in_order_queue(params, count);
     }
     for (auto& count : counts) {
+        go_out_of_order_queue_deps(params, count);
+    }
+    for (auto& count : counts) {
         go_out_of_order_queue(params, count);
     }
     for (auto& count : counts) {
@@ -433,6 +470,9 @@ int main(int argc, char** argv)
             go_in_order_queue_usm(params, count);
         }
         for (auto& count : counts) {
+            go_out_of_order_queue_usm_deps(params, count);
+        }
+        for (auto& count : counts) {
             go_out_of_order_queue_usm(params, count);
         }
         for (auto& count : counts) {
@@ -443,7 +483,7 @@ int main(int argc, char** argv)
         }
     }
 
-    if (testMultipleContext) {
+    if (testMultipleContexts) {
         for (auto& count : counts) {
             go_multiple_context_in_order_queues(params, count);
         }
