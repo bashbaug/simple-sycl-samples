@@ -14,7 +14,7 @@
 using namespace cl;
 using test_clock = std::chrono::high_resolution_clock;
 
-constexpr int maxKernels = 64;
+constexpr int maxKernels = 256;
 constexpr int testIterations = 32;
 
 struct Params
@@ -41,10 +41,28 @@ public:
             result = 0.0f;
             while (result < 1.0f) result += 1e-6f;
         }
-        dst[i] = result;
+        dst[i] += result;
     }
 private:
     sycl::accessor<float> dst;
+    int iterations;
+};
+
+class TimeSinkRO {
+public:
+    TimeSinkRO(sycl::accessor<float> _dst, sycl::accessor<float, 1, sycl::access_mode::read> _src, int _iterations) : 
+        dst(_dst), src(_src), iterations(_iterations) {}
+    void operator()(sycl::id<1> i) const {
+        float result;
+        for (int i = 0; i < iterations; i++) {
+            result = 0.0f;
+            while (result < 1.0f) result += 1e-6f;
+        }
+        dst[i] = src[i] + result;
+    }
+private:
+    sycl::accessor<float> dst;
+    sycl::accessor<float, 1, sycl::access_mode::read> src;
     int iterations;
 };
 
@@ -57,7 +75,7 @@ public:
             result = 0.0f;
             while (result < 1.0f) result += 1e-6f;
         }
-        dst[i] = result;
+        dst[i] += result;
     }
 private:
     float* dst;
@@ -127,7 +145,7 @@ static void go_out_of_order_queue_deps(Params& params, const int numKernels)
     printf("Finished in %f seconds\n", best);
 }
 
-static void go_out_of_order_queue(Params& params, const int numKernels)
+static void go_out_of_order_queue_no_deps(Params& params, const int numKernels)
 {
     init(params);
 
@@ -142,6 +160,40 @@ static void go_out_of_order_queue(Params& params, const int numKernels)
             queue.submit([&](sycl::handler& h) {
                 sycl::accessor acc{params.buffers[i], h};
                 h.parallel_for(params.numElements, TimeSink(acc, params.numIterations));
+            });
+        }
+        queue.wait();
+
+        auto end = test_clock::now();
+        std::chrono::duration<float> elapsed_seconds = end - start;
+        best = std::min(best, elapsed_seconds.count());
+    }
+    printf("Finished in %f seconds\n", best);
+}
+
+static void go_out_of_order_queue_ro_dep(Params& params, const int numKernels)
+{
+    init(params);
+
+    sycl::buffer<float> robuffer{ params.numElements };
+
+    params.queue.submit([&](sycl::handler& h) {
+        sycl::accessor acc{robuffer, h};
+        h.fill(acc, 0.0f);
+    });
+
+    printf("%40s (n=%3d): ", __FUNCTION__, numKernels); fflush(stdout);
+
+    sycl::queue queue(params.context, params.device);
+
+    float best = 999.0f;
+    for (int test = 0; test < testIterations; test++) {
+        auto start = test_clock::now();
+        for (int i = 0; i < numKernels; i++) {
+            queue.submit([&](sycl::handler& h) {
+                sycl::accessor acc{params.buffers[i], h};
+                sycl::accessor roacc{robuffer, h, sycl::read_only};
+                h.parallel_for(params.numElements, TimeSinkRO(acc, roacc, params.numIterations));
             });
         }
         queue.wait();
@@ -301,7 +353,7 @@ static void go_out_of_order_queue_usm_deps(Params& params, const int numKernels)
     printf("Finished in %f seconds\n", best);
 }
 
-static void go_out_of_order_queue_usm(Params& params, const int numKernels)
+static void go_out_of_order_queue_usm_no_deps(Params& params, const int numKernels)
 {
     init_usm(params);
 
@@ -457,10 +509,13 @@ int main(int argc, char** argv)
         go_out_of_order_queue_deps(params, count);
     }
     for (auto& count : counts) {
-        go_out_of_order_queue(params, count);
+        go_multiple_in_order_queues(params, count);
     }
     for (auto& count : counts) {
-        go_multiple_in_order_queues(params, count);
+        go_out_of_order_queue_no_deps(params, count);
+    }
+    for (auto& count : counts) {
+        go_out_of_order_queue_ro_dep(params, count);
     }
     for (auto& count : counts) {
         go_multiple_out_of_order_queues(params, count);
@@ -473,10 +528,10 @@ int main(int argc, char** argv)
             go_out_of_order_queue_usm_deps(params, count);
         }
         for (auto& count : counts) {
-            go_out_of_order_queue_usm(params, count);
+            go_multiple_in_order_queues_usm(params, count);
         }
         for (auto& count : counts) {
-            go_multiple_in_order_queues_usm(params, count);
+            go_out_of_order_queue_usm_no_deps(params, count);
         }
         for (auto& count : counts) {
             go_multiple_out_of_order_queues_usm(params, count);
