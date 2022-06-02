@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2021 Ben Ashbaugh
+// Copyright (c) 2021-2022 Ben Ashbaugh
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,7 @@ int main(
     }
     if (printUsage) {
         std::cerr <<
-            "Usage: dmemhelloworld  [options]\n"
+            "Usage: bigalloc  [options]\n"
             "Options:\n"
             "      -d: Device Index (default = 0)\n"
             "      -p: Platform Index (default = 0)\n"
