@@ -73,21 +73,27 @@ int main(int argc, char** argv)
     int platformIndex = 0;
     int deviceIndex = 0;
 
+    size_t outer = 4;
     size_t iterations = 16;
+    size_t scale = 1;
     size_t gwx = 512;
     size_t gwy = 512;
     size_t lwx = 0;
     size_t lwy = 0;
+    bool useHostUSM = false;
 
     {
         popl::OptionParser op("Supported Options");
         op.add<popl::Value<int>>("p", "platform", "Platform Index", platformIndex, &platformIndex);
         op.add<popl::Value<int>>("d", "device", "Device Index", deviceIndex, &deviceIndex);
-        op.add<popl::Value<size_t>>("i", "iterations", "Iterations", iterations, &iterations);
+        op.add<popl::Value<size_t>>("o", "outer", "Outer Iterations", outer, &outer);
+        op.add<popl::Value<size_t>>("i", "iterations", "Inner Iterations", iterations, &iterations);
+        op.add<popl::Value<size_t>>("m", "memscale", "Memory allocation Scale", scale, &scale);
         op.add<popl::Value<size_t>>("", "gwx", "Global Work Size X AKA Image Width", gwx, &gwx);
         op.add<popl::Value<size_t>>("", "gwy", "Global Work Size Y AKA Image Height", gwy, &gwy);
         op.add<popl::Value<size_t>>("", "lwx", "Local Work Size X", lwx, &lwx);
         op.add<popl::Value<size_t>>("", "lwy", "Local Work Size Y", lwy, &lwy);
+        op.add<popl::Switch>("h", "hostmem", "Use Host USM", &useHostUSM);
 
         bool printUsage = false;
         try {
@@ -114,22 +120,30 @@ int main(int argc, char** argv)
     sycl::context context = sycl::context{ device };
     sycl::queue queue = sycl::queue{ context, device, sycl::property::queue::in_order() };
 
-    sycl::uchar4* ptr = sycl::malloc<sycl::uchar4>(gwx * gwy, device, context, sycl::usm::alloc::host);
-    float cr = -0.123f;
-    float ci = 0.745f;
+    sycl::uchar4* ptr = sycl::malloc<sycl::uchar4>(
+        scale * gwx * gwy,
+        device,
+        context,
+        useHostUSM ? sycl::usm::alloc::host : sycl::usm::alloc::shared);
+
+    // Touch the allocation on the host to cause a transfer.
+    ptr[0] = 1;
 
     auto start = test_clock::now();
-    if (lwx == 0 && lwy == 0) {
-        for (int i = 0; i < iterations; i++) {
-            queue.parallel_for({gwx, gwy}, Julia(ptr, cr, ci));
+    for (int o = 0; o < outer; o++) {
+        if (lwx == 0 && lwy == 0) {
+            for (int i = 0; i < iterations; i++) {
+                queue.parallel_for({gwx, gwy}, Julia(ptr, -0.123f, 0.745f));
+            }
         }
-    }
-    else {
-        for (int i = 0; i < iterations; i++) {
-            queue.parallel_for(sycl::nd_range<2>{{gwx, gwy}, {lwx, lwy}}, Julia(ptr, cr, ci));
+        else {
+            for (int i = 0; i < iterations; i++) {
+                queue.parallel_for(sycl::nd_range<2>{{gwx, gwy}, {lwx, lwy}}, Julia(ptr, -0.123f, 0.745f));
+            }
         }
+        queue.wait();
+        ptr[0] = 1;
     }
-    queue.wait();
     auto end = test_clock::now();
     std::chrono::duration<float> elapsed_seconds = end - start;
     printf("Finished in %f seconds\n", elapsed_seconds.count());
