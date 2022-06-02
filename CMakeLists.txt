@@ -33,6 +33,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project(SimpleSYCLSamples VERSION 1.0)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     enable_testing()
 endif()
