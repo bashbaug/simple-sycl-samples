@@ -33,6 +33,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project(SimpleSYCLSamples VERSION 1.0)
 
+option(SAMPLES_BUILD_CUDA "Enable support for the nvptx64-nvidia-cuda SYCL target")
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

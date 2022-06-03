@@ -42,6 +42,11 @@ function(add_sycl_sample)
     #target_link_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl )
     target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE sycl -fsycl)
 
+    if(SAMPLES_BUILD_CUDA)
+        target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl-targets=nvptx64-nvidia-cuda)
+        target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl-targets=nvptx64-nvidia-cuda)
+    endif()
+
     if (WIN32)
         target_compile_definitions(${SYCL_SAMPLE_TARGET} PRIVATE _CRT_SECURE_NO_WARNINGS)
         target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE /EHa)
