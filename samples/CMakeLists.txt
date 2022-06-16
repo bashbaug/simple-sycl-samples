@@ -72,5 +72,6 @@ add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
 add_subdirectory( 10_queueexperiments )
+add_subdirectory( 11_threadconcurrent )
 
 add_subdirectory( dpcpp )
