@@ -86,6 +86,28 @@ static void go(Params& params, const int kernelNum)
     printf("Average time: %f seconds\n", total / testIterations);
 }
 
+static void go2(Params& params, const int kernelNum)
+{
+    init(params);
+
+    sycl::queue queue(params.context, params.device);
+
+    float total = .0f;
+    auto start = test_clock::now();
+    for (int test = 0; test < testIterations; test++) {
+        queue.submit([&](sycl::handler& h) {
+            sycl::accessor acc{params.buffers[kernelNum], h};
+            h.parallel_for(params.numElements, TimeSink(acc, params.numIterations));
+        });
+    }
+    queue.wait();
+
+    auto end = test_clock::now();
+    std::chrono::duration<float> elapsed_seconds = end - start;
+    printf("%40s (i=%3d): ", __FUNCTION__, kernelNum); fflush(stdout);
+    printf("Average time: %f seconds\n", elapsed_seconds.count() / testIterations);
+}
+
 int main(int argc, char** argv)
 {
     Params params;
@@ -151,6 +173,19 @@ int main(int argc, char** argv)
         //usleep( 100000 );
 
         go(params, 1);
+
+        t.join();
+    }
+
+    printf("Testing with threads 2\n");
+    {
+        std::thread t([params]() mutable {
+            go2(params, 0);
+        });
+
+        //usleep( 100000 );
+
+        go2(params, 1);
 
         t.join();
     }
