@@ -34,8 +34,13 @@ function(add_sycl_sample)
 
     add_executable(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_SOURCES})
 
+    if(SAMPLES_BUILD_CUDA)
+        target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl-targets=spir64,nvptx64-nvidia-cuda)
+        set(SYCL_SAMPLE_LIBS ${SYCL_SAMPLE_LIBS} -fsycl-targets=spir64,nvptx64-nvidia-cuda)
+    endif()
+
     target_include_directories(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_INCLUDES})
-    target_link_libraries(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_LIBS})
+    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_LIBS})
 
     target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda)
     # Passing -fsycl via target_link_libraries for older versions of CMake:
@@ -65,6 +70,7 @@ endfunction()
 
 add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
+add_subdirectory( 00_hellosyclnt )
 add_subdirectory( 04_julia )
 
 add_subdirectory( dpcpp )
