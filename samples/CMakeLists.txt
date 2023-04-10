@@ -21,7 +21,7 @@
 function(add_sycl_sample)
     set(options TEST)
     set(one_value_args NUMBER TARGET CATEGORY)
-    set(multi_value_args SOURCES KERNELS INCLUDES LIBS)
+    set(multi_value_args SOURCES KERNELS INCLUDES LIBS ADDITIONAL_COMPILE_OPTIONS ADDITIONAL_LINK_OPTIONS)
     cmake_parse_arguments(SYCL_SAMPLE
         "${options}" "${one_value_args}" "${multi_value_args}"
         ${ARGN}
@@ -38,9 +38,11 @@ function(add_sycl_sample)
     target_link_libraries(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_LIBS})
 
     target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda)
+    target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS})
     # Passing -fsycl via target_link_libraries for older versions of CMake:
     #target_link_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl )
     target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE sycl -fsycl)
+    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_ADDITIONAL_LINK_OPTIONS})
 
     if (WIN32)
         target_compile_definitions(${SYCL_SAMPLE_TARGET} PRIVATE _CRT_SECURE_NO_WARNINGS)
