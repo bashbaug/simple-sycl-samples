@@ -19,3 +19,5 @@
 # SOFTWARE.
 
 add_subdirectory( usm )
+
+add_subdirectory( 99_invokesimd )
