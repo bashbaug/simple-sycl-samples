@@ -92,13 +92,22 @@ int main(
     // setup
     queue q{ platform::get_platforms()[pi].get_devices()[di], property::queue::in_order() };
 
+    constexpr float GB = 1024.0f * 1024.0f * 1024.0f;
+
     auto d = q.get_device();
     auto c = q.get_context();
 
     std::cout << "Running on SYCL platform: " << 
-        d.get_platform().get_info<info::platform::name>() << std::endl;
+        d.get_platform().get_info<info::platform::name>() << "\n";
     std::cout << "Running on SYCL device: " << 
-        d.get_info<info::device::name>() << std::endl;
+        d.get_info<info::device::name>() << "\n";
+    std::cout << "For this device:\n";
+    std::cout << "\tinfo::device::global_mem_size is " <<
+        d.get_info<info::device::global_mem_size>() << " (" <<
+        d.get_info<info::device::global_mem_size>() / GB << "GB)\n";
+    std::cout << "\tinfo::device::max_mem_alloc_size is " <<
+        d.get_info<info::device::max_mem_alloc_size>() << " (" <<
+        d.get_info<info::device::max_mem_alloc_size>() / GB << "GB)\n";
 
     size_t allocSize = (size_t)sz * 1024 * 1024 * 1024 / sizeof(uint32_t);
     size_t gwx = allocSize / 1024;
