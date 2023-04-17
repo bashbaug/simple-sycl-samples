@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 */
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 #include <popl/popl.hpp>
 
 #include <stdio.h>
@@ -14,7 +14,6 @@
 
 const char* filename = "julia.bmp";
 
-using namespace cl;
 using test_clock = std::chrono::high_resolution_clock;
 
 class Julia {
@@ -60,7 +59,7 @@ public:
 
         color *= 255.0f;
 
-        dst[ y * cWidth + x ] = color.convert<sycl::uchar>();
+        dst[ y * cWidth + x ] = color.convert<uint8_t>();
     }
 private:
     sycl::uchar4* dst;
@@ -121,14 +120,14 @@ int main(int argc, char** argv)
     auto start = test_clock::now();
     if (lwx == 0 && lwy == 0) {
         for (int i = 0; i < iterations; i++) {
-            queue.parallel_for({gwx, gwy}, Julia(ptr, cr, ci));
+            queue.parallel_for(sycl::range<2>{gwx, gwy}, Julia(ptr, cr, ci));
         }
     }
-    else {
-        for (int i = 0; i < iterations; i++) {
-            queue.parallel_for(sycl::nd_range<2>{{gwx, gwy}, {lwx, lwy}}, Julia(ptr, cr, ci));
-        }
-    }
+//    else {
+//        for (int i = 0; i < iterations; i++) {
+//            queue.parallel_for(sycl::nd_range<2>{{gwx, gwy}, {lwx, lwy}}, Julia(ptr, cr, ci));
+//        }
+//    }
     queue.wait();
     auto end = test_clock::now();
     std::chrono::duration<float> elapsed_seconds = end - start;

@@ -4,6 +4,9 @@
 // SPDX-License-Identifier: MIT
 */
 
+// Note, need to run as:
+// IGC_VCSaveStackCallLinkage=1 IGC_VCDirectCallsOnly=1 ./invokesimd
+
 #include <sycl/sycl.hpp>
 #include <sycl/ext/oneapi/experimental/invoke_simd.hpp>
 #include <sycl/ext/intel/esimd.hpp>
@@ -15,9 +18,11 @@
 using namespace sycl;
 
 [[intel::device_indirectly_callable]] SYCL_EXTERNAL
-ext::oneapi::experimental::simd<int, 8> __regcall my_inc(ext::oneapi::experimental::simd<int, 8> x, int n) SYCL_ESIMD_FUNCTION
+ext::oneapi::experimental::simd<int, 8> __regcall
+my_inc(ext::oneapi::experimental::simd<int, 8> x, int n) SYCL_ESIMD_FUNCTION
 {
-    return x + n;
+    ext::intel::esimd::simd<int, 8> ex = x;
+    return ex + n;
 }
 
 int main(int argc, char** argv)
