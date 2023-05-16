@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 function(add_sycl_sample)
+
     set(options TEST)
     set(one_value_args NUMBER TARGET CATEGORY)
     set(multi_value_args SOURCES KERNELS INCLUDES LIBS ADDITIONAL_COMPILE_OPTIONS ADDITIONAL_LINK_OPTIONS)
@@ -34,15 +35,19 @@ function(add_sycl_sample)
 
     add_executable(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_SOURCES})
 
+    if(WITHCUDA)
+        set(SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS ${SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS} -fsycl-targets=spir64,nvptx64-nvidia-cuda)
+        set(SYCL_SAMPLE_LIBS ${SYCL_SAMPLE_LIBS} -fsycl-targets=spir64,nvptx64-nvidia-cuda)
+    endif()
+
     target_include_directories(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_INCLUDES})
-    target_link_libraries(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_LIBS})
 
     target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda)
     target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS})
+
     # Passing -fsycl via target_link_libraries for older versions of CMake:
     #target_link_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl )
-    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE sycl -fsycl)
-    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_ADDITIONAL_LINK_OPTIONS})
+    target_link_libraries(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_LIBS} ${SYCL_SAMPLE_ADDITIONAL_LINK_OPTIONS} -fsycl)
 
     if (WIN32)
         target_compile_definitions(${SYCL_SAMPLE_TARGET} PRIVATE _CRT_SECURE_NO_WARNINGS)

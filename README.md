@@ -15,7 +15,8 @@ samples/                Samples
 
 This section is a work in progress!
 
-These samples are currently built on Windows and Linux (Ubuntu 18.04) using the Beta 6 DPC++ compiler.
+These samples are currently built on Windows and Linux (Ubuntu 22.04) using the 2023.1 DPC++ compiler.
+Building the samples requires CMake 3.10 or newer for Linux, or CMake 3.25 or newer for Windows.
 
 I have been using the Ninja CMake generator.
 Here is how I have been building the samples:
@@ -34,11 +35,11 @@ Here is how I have been building the samples:
     source /path/to/inteloneapi/setvars.sh
     ```
 
-2. Create build files using CMake, specifying the DPC++ toolchain.  For example:
+2. Create build files using CMake.  For example:
 
     ```sh
     mkdir build && cd build
-    cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=../dpcpp_toolchain.cmake ..
+    cmake -G Ninja ..
     ```
 
 3. Build with the generated build files:
