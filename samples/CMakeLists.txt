@@ -19,7 +19,6 @@
 # SOFTWARE.
 
 function(add_sycl_sample)
-
     set(options TEST)
     set(one_value_args NUMBER TARGET CATEGORY)
     set(multi_value_args SOURCES KERNELS INCLUDES LIBS ADDITIONAL_COMPILE_OPTIONS ADDITIONAL_LINK_OPTIONS)
@@ -73,5 +72,7 @@ endfunction()
 add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
+
+add_subdirectory( 11_shuffleexperiments )
 
 add_subdirectory( dpcpp )
