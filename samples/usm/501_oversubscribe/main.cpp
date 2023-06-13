@@ -118,13 +118,6 @@ int main(int argc, char** argv)
             total,
             total / 1024.0 / 1024.0 / 1024.0);
 
-        //size_t freeMem = 0, totalMem = 0;
-        //checkCudaErrors(cudaMemGetInfo(&freeMem, &totalMem));
-
-        //printf("Free memory: %zu bytes (%.1f GB).\n",
-        //    freeMem,
-        //    freeMem / 1024.0 / 1024.0 / 1024.0);
-
         for (int b = i; b < allocs.size(); b++) {
             allocs[b] = buffer;
         }
