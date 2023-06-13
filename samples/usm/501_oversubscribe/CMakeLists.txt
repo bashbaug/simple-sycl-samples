@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Ben Ashbaugh
+# Copyright (c) 2023 Ben Ashbaugh
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,13 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory( 00_usmqueries )
-
-add_subdirectory( 100_dmemhelloworld )
-add_subdirectory( 200_hmemhelloworld )
-add_subdirectory( 201_hmemlinkedlist )
-add_subdirectory( 300_smemhelloworld )
-add_subdirectory( 400_sysmemhelloworld )
-
-add_subdirectory( 500_bigalloc )
-add_subdirectory( 501_oversubscribe )
+add_sycl_sample(
+    TEST
+    NUMBER 501
+    TARGET oversubscribe
+    CATEGORY usm
+    SOURCES main.cpp)

@@ -70,7 +70,6 @@ private:
 
 int main(int argc, char** argv)
 {
-    int platformIndex = 0;
     int deviceIndex = 0;
 
     size_t iterations = 16;
@@ -81,7 +80,6 @@ int main(int argc, char** argv)
 
     {
         popl::OptionParser op("Supported Options");
-        op.add<popl::Value<int>>("p", "platform", "Platform Index", platformIndex, &platformIndex);
         op.add<popl::Value<int>>("d", "device", "Device Index", deviceIndex, &deviceIndex);
         op.add<popl::Value<size_t>>("i", "iterations", "Iterations", iterations, &iterations);
         op.add<popl::Value<size_t>>("", "gwx", "Global Work Size X AKA Image Width", gwx, &gwx);
@@ -105,16 +103,22 @@ int main(int argc, char** argv)
         }
     }
 
-    sycl::platform platform = sycl::platform::get_platforms()[platformIndex];
-    printf("Running on SYCL platform: %s\n", platform.get_info<sycl::info::platform::name>().c_str());
+    auto devices = sycl::device::get_devices();
+    if (deviceIndex > devices.size()) {
+        fprintf(stderr, "Error: device index %d is unavailable, only %zu devices found.\n",
+            deviceIndex, devices.size());
+        return -1;
+    }
 
-    sycl::device device = platform.get_devices()[deviceIndex];
+    sycl::device device = devices[deviceIndex];
+    sycl::platform platform = device.get_platform();
+
+    printf("Running on SYCL platform: %s\n", platform.get_info<sycl::info::platform::name>().c_str());
     printf("Running on SYCL device: %s\n", device.get_info<sycl::info::device::name>().c_str());
 
-    sycl::context context = sycl::context{ device };
-    sycl::queue queue = sycl::queue{ context, device, sycl::property::queue::in_order() };
+    sycl::queue queue = sycl::queue{ device, sycl::property::queue::in_order() };
 
-    sycl::uchar4* ptr = sycl::malloc<sycl::uchar4>(gwx * gwy, device, context, sycl::usm::alloc::host);
+    sycl::uchar4* ptr = sycl::malloc<sycl::uchar4>(gwx * gwy, queue, sycl::usm::alloc::host);
     float cr = -0.123f;
     float ci = 0.745f;
 
