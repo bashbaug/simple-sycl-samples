@@ -31,7 +31,7 @@ int main()
     const size_t array_size = 16;
     int data[array_size];
 
-    queue q{ default_selector{} };
+    queue q;
 
     std::cout << "Hello from SYCL!\n";
     std::cout << "Running on default SYCL device " << q.get_device().get_info<info::device::name>() << std::endl;

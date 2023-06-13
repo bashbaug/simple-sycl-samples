@@ -18,4 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory( usm )
+add_subdirectory( 00_usmqueries )
+
+add_subdirectory( 100_dmemhelloworld )
+add_subdirectory( 200_hmemhelloworld )
+add_subdirectory( 201_hmemlinkedlist )
+add_subdirectory( 300_smemhelloworld )
+add_subdirectory( 400_sysmemhelloworld )
+
+add_subdirectory( 500_bigalloc )

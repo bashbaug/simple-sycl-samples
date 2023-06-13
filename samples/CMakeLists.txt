@@ -74,6 +74,4 @@ add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
 
-add_subdirectory( 201_hmemlinkedlist )
-
-add_subdirectory( dpcpp )
+add_subdirectory( usm )
