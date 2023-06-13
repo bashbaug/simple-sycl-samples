@@ -185,14 +185,13 @@ int main(int argc, char** argv)
     }
 
     auto devices = sycl::device::get_devices();
-
     if (deviceIndex > devices.size()) {
         fprintf(stderr, "Error: device index %d is unavailable, only %zu devices found.\n",
             deviceIndex, devices.size());
         return -1;
     }
 
-    params.device = sycl::device::get_devices()[deviceIndex];
+    params.device = devices[deviceIndex];
     params.platform = params.device.get_platform();
 
     printf("Running on SYCL platform: %s\n", params.platform.get_info<sycl::info::platform::name>().c_str());
