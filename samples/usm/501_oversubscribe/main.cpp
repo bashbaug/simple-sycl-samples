@@ -24,16 +24,16 @@ int main(int argc, char** argv)
 {
     int deviceIndex = 0;
     bool useHost = false;
-    bool useManaged = false;
+    bool useShared = false;
 
     size_t allocSize = 2;
 
     {
         popl::OptionParser op("Supported Options");
         op.add<popl::Value<int>>("d", "device", "Device Index", deviceIndex, &deviceIndex);
-        op.add<popl::Value<size_t>>("s", "sz", "Size per Allocation (GB)", allocSize, &allocSize);
+        op.add<popl::Value<size_t>>("z", "size", "Size per Allocation (GB)", allocSize, &allocSize);
         op.add<popl::Switch>("h", "host", "Use Host Allocations", &useHost);
-        op.add<popl::Switch>("m", "managed", "Use Managed Allocations", &useManaged);
+        op.add<popl::Switch>("s", "shared", "Use Shared Allocations", &useShared);
         bool printUsage = false;
         try {
             op.parse(argc, argv);
@@ -71,8 +71,8 @@ int main(int argc, char** argv)
         deviceGlobalMemSize / 1024.0 / 1024.0 / 1024.0);
     if (useHost) {
         printf("Using host allocations.\n");
-    } else if (useManaged) {
-        printf("Using managed allocations.\n");
+    } else if (useShared) {
+        printf("Using shared allocations.\n");
     } else {
         printf("Using device allocations.\n");
     }
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 
         if (useHost) {
             buffer = sycl::malloc_host<int>(allocSize / sizeof(int), queue);
-        } else if (useManaged) {
+        } else if (useShared) {
             buffer = sycl::malloc_shared<int>(allocSize / sizeof(int), queue);
         } else {
             buffer = sycl::malloc_device<int>(allocSize / sizeof(int), queue);
