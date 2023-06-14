@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 
         if (printUsage || !op.unknown_options().empty() || !op.non_option_args().empty()) {
             fprintf(stderr,
-                "Usage: hmemlinkedlist [options]\n"
+                "Usage: smemlinkedlist [options]\n"
                 "%s", op.help().c_str());
             return -1;
         }
@@ -66,14 +66,14 @@ int main(int argc, char** argv)
         Node* current = nullptr;
         for (size_t i = 0; i < numNodes; i++) {
             if (i == 0) {
-                h_head = sycl::malloc_host<Node>(1, queue);
+                h_head = sycl::malloc_shared<Node>(1, queue);
                 current = h_head;
             }
             
             if (current != nullptr) {
                 current->value = i * 2;
                 if (i != numNodes - 1) {
-                    current->next = sycl::malloc_host<Node>(1, queue);
+                    current->next = sycl::malloc_shared<Node>(1, queue);
                 } else {
                     current->next = nullptr;
                 }

@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     allocSize *= (1024UL * 1024UL * 1024UL);
 
     auto devices = sycl::device::get_devices();
-    if (deviceIndex > devices.size()) {
+    if (deviceIndex >= devices.size()) {
         fprintf(stderr, "Error: device index %d is unavailable, only %zu devices found.\n",
             deviceIndex, devices.size());
         return -1;

@@ -61,24 +61,26 @@ int main(int argc, char** argv)
     auto queue = sycl::queue{ device, sycl::property::queue::in_order() };
 
     printf("Building the linked list...\n");
-    Node*   h_head = nullptr;
+    Node*   d_head = nullptr;
     {
         Node* current = nullptr;
+        Node working;
         for (size_t i = 0; i < numNodes; i++) {
             if (i == 0) {
-                h_head = sycl::malloc_host<Node>(1, queue);
-                current = h_head;
+                d_head = sycl::malloc_device<Node>(1, queue);
+                current = d_head;
             }
             
             if (current != nullptr) {
-                current->value = i * 2;
+                working.value = i * 2;
                 if (i != numNodes - 1) {
-                    current->next = sycl::malloc_host<Node>(1, queue);
+                    working.next = sycl::malloc_device<Node>(1, queue);
                 } else {
-                    current->next = nullptr;
+                    working.next = nullptr;
                 }
 
-                current = current->next;
+                queue.memcpy(current, &working, sizeof(working)).wait();
+                current = working.next;
             }
         }
     }
@@ -86,7 +88,7 @@ int main(int argc, char** argv)
     printf("Updating the linked list on the device...\n");
     {
         queue.single_task([=]() {
-            Node* current = h_head;
+            Node* current = d_head;
             while (current != nullptr) {
                 current->value *= 2;
                 current = current->next;
@@ -98,16 +100,19 @@ int main(int argc, char** argv)
     {
         queue.wait();
 
-        const Node* current = h_head;
+        const Node* current = d_head;
+        Node working;
+        
         size_t mismatches = 0;
         for (size_t i = 0; i < numNodes; i++) {
             if (current == nullptr) {
                 mismatches++;
             } else {
-                if (current->value != i * 4) {
+                queue.memcpy(&working, current, sizeof(working)).wait();
+                if (working.value != i * 4) {
                     mismatches++;
                 }
-                current = current->next;
+                current = working.next;
             }
         }
 

@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     }
 
     auto devices = sycl::device::get_devices();
-    if (deviceIndex > devices.size()) {
+    if (deviceIndex >= devices.size()) {
         fprintf(stderr, "Error: device index %d is unavailable, only %zu devices found.\n",
             deviceIndex, devices.size());
         return -1;
