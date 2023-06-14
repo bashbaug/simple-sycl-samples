@@ -4,10 +4,10 @@
 // SPDX-License-Identifier: MIT
 */
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 #include <iostream>
 
-using namespace cl::sycl;
+using namespace sycl;
 
 const size_t  gwx = 1024*1024;
 
