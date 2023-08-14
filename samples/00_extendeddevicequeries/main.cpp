@@ -29,11 +29,19 @@ int main()
             if (d.has(aspect::ext_intel_gpu_slices)) {
                 printf("\tNum Slices:      %u\n", d.get_info<ext::intel::info::device::gpu_slices>());
             }
-            if (d.has(aspect::ext_intel_gpu_subslices_per_slice)) {
-                printf("\tNum Sub-Slices:  %u\n", d.get_info<ext::intel::info::device::gpu_subslices_per_slice>());
+            if (d.has(aspect::ext_intel_gpu_slices) &&
+                d.has(aspect::ext_intel_gpu_subslices_per_slice)) {
+                printf("\tNum Sub-Slices:  %u\n",
+                    d.get_info<ext::intel::info::device::gpu_slices>() *
+                    d.get_info<ext::intel::info::device::gpu_subslices_per_slice>());
             }
-            if (d.has(aspect::ext_intel_gpu_eu_count_per_subslice)) {
-                printf("\tNum EUs:         %u\n", d.get_info<ext::intel::info::device::gpu_eu_count_per_subslice>());
+            if (d.has(aspect::ext_intel_gpu_slices) && 
+                d.has(aspect::ext_intel_gpu_subslices_per_slice) &&
+                d.has(aspect::ext_intel_gpu_eu_count_per_subslice)) {
+                printf("\tNum EUs:         %u\n",
+                    d.get_info<ext::intel::info::device::gpu_slices>() *
+                    d.get_info<ext::intel::info::device::gpu_subslices_per_slice>() *
+                    d.get_info<ext::intel::info::device::gpu_eu_count_per_subslice>());
             }
 #endif
 #if SYCL_EXT_INTEL_DEVICE_INFO >= 2
@@ -51,17 +59,3 @@ int main()
 
     return 0;
 }
-
-
-/*
-Device[6]:
-        type:           GPU
-        name:           Intel(R) Data Center GPU Max 1550
-        vendorId:       8086
-        deviceId:       0BD5
-        numSubDevices:  0
-        numSlices:      1
-        numSubSlices:   64
-        numEUs:         512
-        deviceuuid:     8680D50B-2F00-0000-CA00-000000000001
-*/
