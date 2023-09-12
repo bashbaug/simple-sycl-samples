@@ -36,8 +36,8 @@ function(add_sycl_sample)
     add_executable(${SYCL_SAMPLE_TARGET} ${SYCL_SAMPLE_SOURCES})
 
     if(WITHCUDA)
-        set(SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS ${SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS} -fsycl-targets=spir64,nvptx64-nvidia-cuda)
-        set(SYCL_SAMPLE_LIBS ${SYCL_SAMPLE_LIBS} -fsycl-targets=spir64,nvptx64-nvidia-cuda)
+        set(SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS ${SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS} -fsycl-targets=nvptx64-nvidia-cuda,spir64 -Xsycl-target-backend=nvptx64-nvidia-cuda --cuda-gpu-arch=${CUDA_GPU_ARCH})
+        set(SYCL_SAMPLE_LIBS ${SYCL_SAMPLE_LIBS} -fsycl-targets=nvptx64-nvidia-cuda,spir64 -Xsycl-target-backend=nvptx64-nvidia-cuda --cuda-gpu-arch=${CUDA_GPU_ARCH})
     endif()
 
     target_include_directories(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_INCLUDES})

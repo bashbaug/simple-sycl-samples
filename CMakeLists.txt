@@ -32,6 +32,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(SimpleSYCLSamples VERSION 1.0)
 option(WITHCUDA "Enable CUDA device support.")
 
+set(CUDA_GPU_ARCH "sm_60" CACHE STRING "CUDA GPUs to compile for.")
+if (WITHCUDA)
+    mark_as_advanced(CLEAR FORCE CUDA_GPU_ARCH)
+else()
+    mark_as_advanced(FORCE CUDA_GPU_ARCH)
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
