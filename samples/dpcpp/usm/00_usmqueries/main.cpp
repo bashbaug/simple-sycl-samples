@@ -20,10 +20,10 @@
 // SOFTWARE.
 */
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 #include <iostream>
 
-using namespace cl::sycl;
+using namespace sycl;
 
 int main()
 {
@@ -42,8 +42,6 @@ int main()
                 << d.has(aspect::usm_host_allocations) << std::endl;
             std::cout << "\t\tSupports usm_atomic_host_allocations: "
                 << d.has(aspect::usm_atomic_host_allocations) << std::endl;
-            std::cout << "\t\tSupports usm_restricted_shared_allocations: "
-                << d.has(aspect::usm_restricted_shared_allocations) << std::endl;
             std::cout << "\t\tSupports usm_shared_allocations: "
                 << d.has(aspect::usm_shared_allocations) << std::endl;
             std::cout << "\t\tSupports usm_atomic_shared_allocations: "

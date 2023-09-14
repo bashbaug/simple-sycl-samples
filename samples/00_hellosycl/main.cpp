@@ -20,10 +20,10 @@
 // SOFTWARE.
 */
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 #include <iostream>
 
-using namespace cl::sycl;
+using namespace sycl;
 class Hello;
 
 int main()
@@ -31,7 +31,7 @@ int main()
     const size_t array_size = 16;
     int data[array_size];
 
-    queue q{ default_selector{} };
+    queue q{ default_selector_v };
 
     std::cout << "Hello from SYCL!\n";
     std::cout << "Running on default SYCL device " << q.get_device().get_info<info::device::name>() << std::endl;
