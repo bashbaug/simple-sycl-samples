@@ -146,7 +146,8 @@ int main(int, char**) {
         std::vector<int> h_dst(num_wis * per_wi);
         q.copy(dst, h_dst.data(), h_dst.size()).wait();
         checkCopyResults(h_dst, h_src);
-        std::cout << "Finished scalar copy in " << best << " seconds.\n";
+        auto gbps = num_wis * per_wi * sizeof(int) / best / 1024 / 1024 / 1024;
+        std::cout << "Finished scalar copy in " << best << " seconds (" << gbps << " GB/s).\n";
     }
 
     {
@@ -163,7 +164,8 @@ int main(int, char**) {
         std::vector<int> h_dst(num_wis * per_wi);
         q.copy(dst, h_dst.data(), h_dst.size()).wait();
         checkCopyResults(h_dst, h_src);
-        std::cout << "Finished coalesced copy in " << best << " seconds.\n";
+        auto gbps = num_wis * per_wi * sizeof(int) / best / 1024 / 1024 / 1024;
+        std::cout << "Finished coalesced copy in " << best << " seconds (" << gbps << " GB/s).\n";
     }
 
     {
@@ -180,7 +182,8 @@ int main(int, char**) {
         std::vector<int> h_dst(num_wis);
         q.copy(dst, h_dst.data(), h_dst.size()).wait();
         checkPartialReductionResults(h_dst, h_src);
-        std::cout << "Finished scalar partial reduction in " << best << " seconds.\n";
+        auto gbps = num_wis * per_wi * sizeof(int) / best / 1024 / 1024 / 1024;
+        std::cout << "Finished scalar partial reduction in " << best << " seconds (" << gbps << " GB/s).\n";
     }
 
     {
@@ -197,7 +200,8 @@ int main(int, char**) {
         std::vector<int> h_dst(num_wis);
         q.copy(dst, h_dst.data(), h_dst.size()).wait();
         checkPartialReductionResults(h_dst, h_src);
-        std::cout << "Finished coalesced partial reduction in " << best << " seconds.\n";
+        auto gbps = num_wis * per_wi * sizeof(int) / best / 1024 / 1024 / 1024;
+        std::cout << "Finished coalesced partial reduction in " << best << " seconds (" << gbps << " GB/s).\n";
     }
 
     sycl::free(src, q);
