@@ -73,5 +73,6 @@ endfunction()
 add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
+add_subdirectory( 99_loadperf )
 
 add_subdirectory( dpcpp )
