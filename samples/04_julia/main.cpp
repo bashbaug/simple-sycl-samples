@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 */
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 #include <popl/popl.hpp>
 
 #include <stdio.h>
@@ -14,12 +14,11 @@
 
 const char* filename = "julia.bmp";
 
-using namespace cl;
 using test_clock = std::chrono::high_resolution_clock;
 
 class Julia {
 public:
-    Julia(sycl::uchar4* _dst, float _cr, float _ci) : dst(_dst), cr(_cr), ci(_ci) {}
+  Julia(sycl::vec<std::uint8_t,4>* _dst, float _cr, float _ci) : dst(_dst), cr(_cr), ci(_ci) {}
     void operator()(sycl::item<2> item) const {
         const float cMinX = -1.5f;
         const float cMaxX =  1.5f;
@@ -60,7 +59,7 @@ public:
 
         color *= 255.0f;
 
-        dst[ y * cWidth + x ] = color.convert<sycl::uchar>();
+        dst[ y * cWidth + x ] = color.convert<std::uint8_t>();
     }
 private:
     sycl::uchar4* dst;
