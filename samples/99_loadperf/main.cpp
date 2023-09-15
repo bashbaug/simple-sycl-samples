@@ -29,7 +29,8 @@ public:
 
         #pragma unroll
         for (size_t i = 0; i < per_wi; i++) {
-            dst[gid + i] = src[gid + i];
+            dst[gid] = src[gid];
+            gid++;
         }
     }
 private:
@@ -41,11 +42,13 @@ class CopyCoalesced {
 public:
     CopyCoalesced(int* dst_, int* src_) : dst(dst_), src(src_) {}
     void operator() [[intel::kernel_args_restrict]] (sycl::nd_item<1> item) const {
+        const auto inc = item.get_local_range(0);
         auto gid = item.get_group(0) * item.get_local_range(0) * per_wi + item.get_local_id(0);
 
         #pragma unroll
         for (size_t i = 0; i < per_wi; i++) {
-            dst[gid + i * item.get_local_range(0)] = src[gid + i * item.get_local_range(0)];;
+            dst[gid] = src[gid];
+            gid += inc;
         }
     }
 private:
@@ -78,7 +81,8 @@ public:
 
         #pragma unroll
         for (size_t i = 0; i < per_wi; i++) {
-            sum += src[srcid + i];
+            sum += src[srcid];
+            srcid++;
         }
 
         auto dstid = item.get_group(0) * item.get_local_range(0) + item.get_local_id(0);
@@ -93,12 +97,14 @@ class PartialReductionCoalesced {
 public:
     PartialReductionCoalesced(int* dst_, int* src_) : dst(dst_), src(src_) {}
     void operator() [[intel::kernel_args_restrict]] (sycl::nd_item<1> item) const {
+        const auto inc = item.get_local_range(0);
         auto srcid = item.get_group(0) * item.get_local_range(0) * per_wi + item.get_local_id(0);
         int sum = 0;
 
         #pragma unroll
         for (size_t i = 0; i < per_wi; i++) {
-            sum += src[srcid + i * item.get_local_range(0)];;
+            sum += src[srcid];
+            srcid += inc;
         }
 
         auto dstid = item.get_group(0) * item.get_local_range(0) + item.get_local_id(0);
@@ -113,15 +119,17 @@ class PartialReductionCoalescedx4 {
 public:
     PartialReductionCoalescedx4(int* dst_, int* src_) : dst(dst_), src(src_) {}
     void operator() [[intel::kernel_args_restrict]] (sycl::nd_item<1> item) const {
+        const auto inc = item.get_local_range(0) * 4;
         auto srcid = item.get_group(0) * item.get_local_range(0) * per_wi + item.get_local_id(0) * 4;
         int sum = 0;
 
         #pragma unroll
         for (size_t i = 0; i < per_wi / 4; i++) {
-            sum += src[srcid + i * item.get_local_range(0) * 4 + 0];
-            sum += src[srcid + i * item.get_local_range(0) * 4 + 1];
-            sum += src[srcid + i * item.get_local_range(0) * 4 + 2];
-            sum += src[srcid + i * item.get_local_range(0) * 4 + 3];
+            sum += src[srcid + 0];
+            sum += src[srcid + 1];
+            sum += src[srcid + 2];
+            sum += src[srcid + 3];
+            srcid += inc;
         }
 
         auto dstid = item.get_group(0) * item.get_local_range(0) + item.get_local_id(0);
