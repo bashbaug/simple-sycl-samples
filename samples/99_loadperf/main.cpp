@@ -79,10 +79,12 @@ public:
         auto srcid = ( item.get_group(0) * item.get_local_range(0) + item.get_local_id(0) ) * per_wi;
         int sum = 0;
 
+        auto rsrc = src + srcid;
+
         #pragma unroll
         for (size_t i = 0; i < per_wi; i++) {
-            sum += src[srcid];
-            srcid++;
+            sum += rsrc[0];
+            rsrc++;
         }
 
         auto dstid = item.get_group(0) * item.get_local_range(0) + item.get_local_id(0);
@@ -101,10 +103,12 @@ public:
         auto srcid = item.get_group(0) * item.get_local_range(0) * per_wi + item.get_local_id(0);
         int sum = 0;
 
+        auto rsrc = src + srcid;
+
         #pragma unroll
         for (size_t i = 0; i < per_wi; i++) {
-            sum += src[srcid];
-            srcid += inc;
+            sum += rsrc[0];
+            rsrc += inc;
         }
 
         auto dstid = item.get_group(0) * item.get_local_range(0) + item.get_local_id(0);
@@ -123,13 +127,15 @@ public:
         auto srcid = item.get_group(0) * item.get_local_range(0) * per_wi + item.get_local_id(0) * 4;
         int sum = 0;
 
+        auto rsrc = src + srcid;
+
         #pragma unroll
         for (size_t i = 0; i < per_wi / 4; i++) {
-            sum += src[srcid + 0];
-            sum += src[srcid + 1];
-            sum += src[srcid + 2];
-            sum += src[srcid + 3];
-            srcid += inc;
+            sum += rsrc[0];
+            sum += rsrc[1];
+            sum += rsrc[2];
+            sum += rsrc[3];
+            rsrc += inc;
         }
 
         auto dstid = item.get_group(0) * item.get_local_range(0) + item.get_local_id(0);
