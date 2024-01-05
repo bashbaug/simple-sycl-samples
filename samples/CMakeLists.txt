@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Ben Ashbaugh
+# Copyright (c) 2021-2024 Ben Ashbaugh
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -73,5 +73,7 @@ endfunction()
 add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
+
+add_subdirectory( 99_matrixexperiments )
 
 add_subdirectory( dpcpp )
