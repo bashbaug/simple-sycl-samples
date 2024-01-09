@@ -350,17 +350,21 @@ int main(int argc, char** argv)
     std::cout << "\tValidating data?: " << std::boolalpha << validate << "\n";
     std::cout << "\tFixed data?: " << std::boolalpha << fixedData << "\n";
 
-    std::vector<bfloat16> A_vec(matrixSize * matrixSize);
-    std::vector<bfloat16> B_vec(matrixSize * matrixSize);
-    std::vector<bfloat16> Bvnni_vec(matrixSize * matrixSize);
+    const auto M = matrixSize;
+    const auto N = matrixSize;
+    const auto K = matrixSize;
 
-    std::vector<float> C_ref(matrixSize * matrixSize);
+    std::vector<bfloat16> A_vec(M * K);
+    std::vector<bfloat16> B_vec(K * N);
+    std::vector<bfloat16> Bvnni_vec(K * N);
+
+    std::vector<float> C_ref(M * N);
 
     std::cout << "Initializing source matrices...\n";
-    fill_matrix(A_vec, matrixSize, matrixSize);
-    fill_matrix(B_vec, matrixSize, matrixSize);
+    fill_matrix(A_vec, M, K);
+    fill_matrix(B_vec, K, N);
 
-    vnni_matrix(Bvnni_vec, B_vec, matrixSize, matrixSize, 2);
+    vnni_matrix(Bvnni_vec, B_vec, K, N, 2);
 
     bfloat16* A = sycl::malloc_device<bfloat16>(A_vec.size(), q);
     bfloat16* B = sycl::malloc_device<bfloat16>(B_vec.size(), q);
@@ -374,20 +378,20 @@ int main(int argc, char** argv)
 
     if (validate) {
         std::cout << "Computing reference...\n";
-        compute_reference(C_ref, A_vec, B_vec, matrixSize, matrixSize, matrixSize);
+        compute_reference(C_ref, A_vec, B_vec, M, N, K);
     }
 
     std::cout << "Running tests...\n";
 
-    go_naive(q, C, A, B, matrixSize, matrixSize, matrixSize, C_ref);
+    go_naive(q, C, A, B, M, N, K, C_ref);
 
 #if 0
-    go_joint_matrix_rowmajor_m1(q, C, A, B, matrixSize, matrixSize, matrixSize, C_ref);
+    go_joint_matrix_rowmajor_m1(q, C, A, B, M, N, K, C_ref);
 #endif
-    go_joint_matrix_vnni<1, 8, 16>(q, C, A, Bvnni, matrixSize, matrixSize, matrixSize, C_ref);
-    go_joint_matrix_vnni<2, 8, 16>(q, C, A, Bvnni, matrixSize, matrixSize, matrixSize, C_ref);
-    go_joint_matrix_vnni<4, 8, 16>(q, C, A, Bvnni, matrixSize, matrixSize, matrixSize, C_ref);
-    go_joint_matrix_vnni<8, 8, 16>(q, C, A, Bvnni, matrixSize, matrixSize, matrixSize, C_ref);
+    go_joint_matrix_vnni<1, 8, 16>(q, C, A, Bvnni, M, N, K, C_ref);
+    go_joint_matrix_vnni<2, 8, 16>(q, C, A, Bvnni, M, N, K, C_ref);
+    go_joint_matrix_vnni<4, 8, 16>(q, C, A, Bvnni, M, N, K, C_ref);
+    go_joint_matrix_vnni<8, 8, 16>(q, C, A, Bvnni, M, N, K, C_ref);
 
     std::cout << "Success.\n";
     return 0;
