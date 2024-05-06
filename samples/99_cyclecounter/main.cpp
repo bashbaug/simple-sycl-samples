@@ -26,11 +26,13 @@ int main(int argc, char** argv )
 {
     int platformIndex = 0;
     int deviceIndex = 0;
+    int iterations = 10;
 
     {
         popl::OptionParser op("Supported Options");
         op.add<popl::Value<int>>("p", "platform", "Platform Index", platformIndex, &platformIndex);
         op.add<popl::Value<int>>("d", "device", "Device Index", deviceIndex, &deviceIndex);
+        op.add<popl::Value<int>>("i", "iterations", "Iterations", iterations, &iterations);
 
         bool printUsage = false;
         try {
@@ -66,7 +68,7 @@ int main(int argc, char** argv )
 
             // waste a fair bit of time:
             float reg;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < iterations; i++) {
                 reg = 0.f;
                 while (reg < 1.f)
                     reg += 1e-7f;
