@@ -74,4 +74,6 @@ add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
 
+add_subdirectory( 99_reductions )
+
 add_subdirectory( dpcpp )
