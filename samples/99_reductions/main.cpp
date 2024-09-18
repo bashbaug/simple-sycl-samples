@@ -12,6 +12,9 @@
 #include <sycl/sycl.hpp>
 #include <sycl/ext/oneapi/group_local_memory.hpp>
 
+class Standard;
+class Alternate;
+
 using test_clock = std::chrono::high_resolution_clock;
 
 constexpr auto vec_size = 16;
@@ -202,7 +205,7 @@ int main(int argc, char** argv)
   {
     auto start = test_clock::now();
     for (size_t i = 0; i < iterations; i++) {
-      queue.parallel_for(sycl::nd_range<1>{gws, wg_size}, [=](sycl::nd_item<1> it) {
+      queue.parallel_for<Standard>(sycl::nd_range<1>{gws, wg_size}, [=](sycl::nd_item<1> it) {
           auto gid = it.get_global_id(0);
           auto g = it.get_group();
           fvec value = dinput[gid];
@@ -224,7 +227,7 @@ int main(int argc, char** argv)
   {
     auto start = test_clock::now();
     for (size_t i = 0; i < iterations; i++) {
-      queue.parallel_for(sycl::nd_range<1>{gws, wg_size}, [=](sycl::nd_item<1> it) [[sycl::reqd_sub_group_size(sg_size)]] {
+      queue.parallel_for<Alternate>(sycl::nd_range<1>{gws, wg_size}, [=](sycl::nd_item<1> it) [[sycl::reqd_sub_group_size(sg_size)]] {
           auto gid = it.get_global_id(0);
           fvec value = dinput[gid];
           auto group_max = group_reduce_max<float, vec_size>(value);

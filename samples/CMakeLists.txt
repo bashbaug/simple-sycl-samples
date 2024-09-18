@@ -42,7 +42,7 @@ function(add_sycl_sample)
 
     target_include_directories(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_INCLUDES})
 
-    target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda)
+    target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE -fsycl -fsycl-unnamed-lambda -fno-sycl-instrument-device-code)
     target_compile_options(${SYCL_SAMPLE_TARGET} PRIVATE ${SYCL_SAMPLE_ADDITIONAL_COMPILE_OPTIONS})
 
     # Passing -fsycl via target_link_libraries for older versions of CMake:
