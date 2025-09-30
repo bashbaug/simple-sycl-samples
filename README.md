@@ -15,7 +15,7 @@ samples/                Samples
 
 This section is a work in progress!
 
-These samples are currently built on Windows and Linux (Ubuntu 22.04) using the 2023.1 DPC++ compiler.
+These samples are currently built on Windows and Linux (Ubuntu 24.04) using the 2025.X DPC++ compiler.
 Building the samples requires CMake 3.10 or newer for Linux, or CMake 3.25 or newer for Windows.
 
 I have been using the Ninja CMake generator.
