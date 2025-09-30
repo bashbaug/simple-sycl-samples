@@ -75,8 +75,6 @@ int main(int argc, char** argv)
     size_t iterations = 16;
     size_t gwx = 512;
     size_t gwy = 512;
-    size_t lwx = 0;
-    size_t lwy = 0;
 
     {
         popl::OptionParser op("Supported Options");
@@ -85,8 +83,6 @@ int main(int argc, char** argv)
         op.add<popl::Value<size_t>>("i", "iterations", "Iterations", iterations, &iterations);
         op.add<popl::Value<size_t>>("", "gwx", "Global Work Size X AKA Image Width", gwx, &gwx);
         op.add<popl::Value<size_t>>("", "gwy", "Global Work Size Y AKA Image Height", gwy, &gwy);
-        op.add<popl::Value<size_t>>("", "lwx", "Local Work Size X", lwx, &lwx);
-        op.add<popl::Value<size_t>>("", "lwy", "Local Work Size Y", lwy, &lwy);
 
         bool printUsage = false;
         try {
@@ -118,15 +114,8 @@ int main(int argc, char** argv)
     float ci = 0.745f;
 
     auto start = test_clock::now();
-    if (lwx == 0 && lwy == 0) {
-        for (int i = 0; i < iterations; i++) {
-            queue.parallel_for({gwx, gwy}, Julia(ptr, cr, ci));
-        }
-    }
-    else {
-        for (int i = 0; i < iterations; i++) {
-            queue.parallel_for(sycl::nd_range<2>{{gwx, gwy}, {lwx, lwy}}, Julia(ptr, cr, ci));
-        }
+    for (int i = 0; i < iterations; i++) {
+        queue.parallel_for({gwx, gwy}, Julia(ptr, cr, ci));
     }
     queue.wait();
     auto end = test_clock::now();

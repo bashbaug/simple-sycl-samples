@@ -20,7 +20,7 @@
 // SOFTWARE.
 */
 
-#include <sycl.hpp>
+#include <sycl/sycl.hpp>
 #include <iostream>
 
 using namespace sycl;
