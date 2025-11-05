@@ -2,4 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
+add_subdirectory( 00_maxregs )
+
 add_subdirectory( usm )
