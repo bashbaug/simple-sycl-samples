@@ -58,4 +58,6 @@ add_subdirectory( 00_enumsycl )
 add_subdirectory( 00_hellosycl )
 add_subdirectory( 04_julia )
 
+add_subdirectory( 10_bigrange )
+
 add_subdirectory( dpcpp )
