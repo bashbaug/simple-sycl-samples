@@ -88,7 +88,7 @@ SYCL_EXTERNAL void __attribute__((convergent)) __spirv_Subgroup2DBlockStoreINTEL
     int memory_width, int memory_height, int memory_pitch,
     coord_t coordinate);
 
-#ifndef __SYCL_DEVICE_ONLY__
+#if !defined(__SPIRV__) && !defined(__SPIR__)
 void __spirv_Subgroup2DBlockLoadINTEL(
     int element_size, int block_width, int block_height, int block_count,
     const void* src_base_pointer, int memory_width, int memory_height, int memory_pitch,
