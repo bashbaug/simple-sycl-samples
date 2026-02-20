@@ -57,6 +57,24 @@ int main(int argc, char** argv)
         sycl::device device = platform.get_devices()[deviceIndex];
         printf("Running on SYCL device: %s\n", device.get_info<sycl::info::device::name>().c_str());
 
+        #if defined(SYCL_KHR_MAX_WORK_GROUP_QUERIES)
+            printf("For this device, max_work_group_range_size is: %zu\n",
+                device.get_info<sycl::khr::info::device::max_work_group_range_size>());
+            printf("    max_work_group_range is: %zu, %zu, %zu\n",
+                device.get_info<sycl::khr::info::device::max_work_group_range>()[0],
+                device.get_info<sycl::khr::info::device::max_work_group_range>()[1],
+                device.get_info<sycl::khr::info::device::max_work_group_range>()[2]);
+        #elif defined(SYCL_EXT_ONEAPI_MAX_WORK_GROUP_QUERY)
+            printf("For this device, max_global_work_groups is: %zu\n",
+                device.get_info<sycl::ext::oneapi::experimental::info::device::max_global_work_groups>());
+            printf("    max_work_groups is: %zu, %zu, %zu\n",
+                device.get_info<sycl::ext::oneapi::experimental::info::device::max_work_groups<3>>()[0],
+                device.get_info<sycl::ext::oneapi::experimental::info::device::max_work_groups<3>>()[1],
+                device.get_info<sycl::ext::oneapi::experimental::info::device::max_work_groups<3>>()[2]);
+        #else
+            printf("No max work group query support is available.\n");
+        #endif
+
         sycl::context context = sycl::context{ device };
         sycl::queue queue = sycl::queue{ context, device, handle_async_error, sycl::property::queue::in_order() };
 
@@ -71,6 +89,7 @@ int main(int argc, char** argv)
         queue.fill(pDevCheck, 0, sz).wait_and_throw();
 
         printf("Launching a kernel with global work size %zu and local work size %zu...\n", gwx, lwx);
+        printf("Note: This is %zu work-groups.\n", gwx / lwx);
 
         queue.parallel_for(sycl::nd_range<1>{gwx, lwx}, [=](sycl::nd_item<1> item) {
             const size_t global_id = item.get_global_id(0);
