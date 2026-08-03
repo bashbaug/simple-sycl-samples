@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+add_subdirectory( 00_hellousm )
 add_subdirectory( 00_usmqueries )
 
 add_subdirectory( 100_dmemhelloworld )
